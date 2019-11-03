@@ -14,6 +14,8 @@ CONFIG_FILE=~/".$BASE_NAME.cfg"
 
 # global variables
 declare HOSTNAME=$(hostname)
+[ "$HOSTNAME" == "localhost" ] && command -v cloud-init >/dev/null && HOSTNAME=$(cloud-init query ds.meta_data.public_hostname)
+
 declare BACKUP_FOLDER=
 declare -a FILES
 
