@@ -356,9 +356,6 @@ function createAccessToken() {
     REFRESH_TOKEN=$(echo "${RESPONSE}" | jsonValue refresh_token 1)
 
     updateConfig REFRESH_TOKEN
-
-    updateConfig ACCESS_TOKEN
-    updateConfig TOKEN_TYPE
 }
 
 # refreshs the access token (every access token is valid for one hour)

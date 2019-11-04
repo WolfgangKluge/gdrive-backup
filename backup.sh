@@ -49,7 +49,7 @@ function create() {
     local i
     local -a canonical
     for (( i = 0; i < ${#files[@]}; i++ )); do
-        canonical[i]=$((cd "${files[i]}" && pwd))
+        canonical[i]=$(cd "${files[i]}" && pwd)
     done
 
     # sort files
@@ -63,7 +63,7 @@ function create() {
     local md5=$(echo "${canonical[@]}" | md5sum -t -)
     md5="${md5/ *}"
 
-    names=$((IFS=','; echo "${basenames[*]}"))
+    names=$(IFS=','; echo "${basenames[*]}")
 
     local date=$(date -uIseconds)
     date=${date::-6}
@@ -243,7 +243,7 @@ function parse_args() {
                     OPTARG="${OPTARG#*=}"
                     if [ "${OPTARG:0:1}" == "-" ]; then
                         RESET_WEEKDAY=-1
-                    else
+                    elif [ "${OPTARG:0:1}" != "" ]; then
                         RESET_WEEKDAY=$(( (OPTARG - 1) % 7 + 1 ))
                     fi
                     ;;
