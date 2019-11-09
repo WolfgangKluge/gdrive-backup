@@ -135,6 +135,7 @@ function restore() {
 
     gpg \
         --quiet \
+        --batch \
         --decrypt-files \
         --passphrase="${PASSPHRASE}" \
         *.gpg
