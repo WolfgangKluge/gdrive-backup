@@ -221,15 +221,17 @@ function deleteFiles(){
 
     local FILE_ID
     for FILE_ID in "${FILE_IDs}"; do
+        [ "${FILE_ID}" == "" ] && continue;
         log "Delete ${FILE_ID}" 1
-        $(docurl \
+
+        docurl \
             --silent  \
             -X DELETE \
             -H "Authorization: ${TOKEN_TYPE} ${ACCESS_TOKEN}" \
             -H "Content-Type: application/json; charset=UTF-8" \
             --get \
             --data "key=${API_KEY}" \
-            "${API_ENDPOINT}/files/${FILE_ID}")
+            "${API_ENDPOINT}/files/${FILE_ID}"
     done
 }
 
@@ -275,7 +277,7 @@ function uploadFile(){
 
     # Curl command to initiate resumable upload session and grab the location URL
     #log "Generating upload link for file ${FILE} ..."
-    local uploadlink=$(docurl \
+    local uploadlink=$(curl \
                 --silent \
                 -X POST \
                 -H "Host: www.googleapis.com" \
@@ -285,13 +287,18 @@ function uploadFile(){
                 -H "X-Upload-Content-Length: ${FILESIZE}" \
                 --data "${postData}" \
                 "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&key=${API_KEY}" \
-                --dump-header - | sed -ne s/"Location: "//p | tr -d '\r\n')
+                --dump-header - | sed -ne s/"Location: "//Ip | tr -d '\r\n')
+
+    if [ "${uploadlink}" == "" ]; then
+        log "Error while generating upload link for file ${FILE}"
+        exit 1
+    fi
 
     # Curl command to push the file to google drive.
     # If the file size is large then the content can be split to chunks and uploaded.
     # In that case content range needs to be specified.
     log "Uploading file ${FILE}..."
-    $(docurl \
+    docurl \
         --silent \
         -X PUT \
         -H "Authorization: ${TOKEN_TYPE} ${ACCESS_TOKEN}" \
@@ -301,7 +308,7 @@ function uploadFile(){
         -H "Transfer-Encoding: chunked" \
         -T "${FILE}" \
         --output /dev/null \
-        "${uploadlink}" &)
+        "${uploadlink}" &
 }
 
 # Method to upload a folder to google drive recursivly. Requires 2 arguments: folder path and google folder id
